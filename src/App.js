@@ -3,21 +3,25 @@ import VLPlayerCore from '@viewlift/player/esm/index';
 // import VLPlayerCore from 'dev-player/index';
 import '@viewlift/player/esm/bundle.css'
 
-
 export default function PlayerTestPage() {
+  const VlCore = VLPlayerCore()
   const playerVersion = window?.vl_player_version
   const [mode, setMode] = useState('direct'); // 'config' or 'direct'
-  const [error, setError] = useState(''); // 'config' or 'direct'
+  const [error, setError] = useState('');
+  const [disableControls, setDisableControls] = useState(false);
   const [configInputs, setConfigInputs] = useState({
     token: '',
     videoId: '',
     apiBaseUrl: '',
     sourceUrl: '',
+    autoplay: true,
+    mute: false,
+    theme: 'defaultV2', 
   });
 
-  const handleMode = (inp) => {
+  const handleMode = (mode) => {
     setError("")
-    setMode(inp)
+    setMode(mode)
   }
 
   const handleChange = (e) => {
@@ -34,35 +38,51 @@ export default function PlayerTestPage() {
 
     if(mode === "config" && (!videoId || !token || !apiBaseUrl)) return setError("Missing Configuration Values")
     else if (mode === "direct" && !videoSourceUrl) return setError("Missing Configuration Values")
-        
+    if(!disableControls) setDisableControls(true)
     let config = {
-      playerId: playerId,
+      playerId,
       videoId,
       token,
       videoSourceUrl,
       apiBaseUrl, 
-      muted: true,
-      autoplay: true,
-      // skin: 'VL_ONE',
+      muted: configInputs?.mute,
+      autoplay: configInputs?.autoplay,
+      skin: configInputs?.theme || 'VL_ONE',
       // airplay:true,
       // enableAdvertisements:false,
       // chromecastReceiverId: '764F169F',
-      // showPositiveSeekbar: true,
       // showPositiveSeekbar: false,
-      // apiBaseUrl: "https://api.uat.monumentalsportsnetwork.com",
-      // apiBaseUrl:'https://api.monumentalsportsnetwork.com',
-      // apiBaseUrl:"https://api.uat-livgolfplus.viewlift.com",
-      // apiBaseUrl: "https://chsn.staging.api.viewlift.com",
-      // apiBaseUrl: "https://livgolfplus.staging.api.viewlift.com",
     }
+    console.log("config:", config)
     
-    VLPlayerCore().init(config).then((e)=>{
-      console.log(e);
-    })
-    .catch((e) => {
-      setError("Something went wrong")
-      console.log("Error: ", e)
-    })
+    if (mode === "config" && VlCore?.isPlayerInitialised(playerId)){
+      VlCore.load(playerId, videoId, token)
+      .catch((e) => {
+        const errorMsg = (typeof e === "string") ? e : (e?.response?.response?.data?.errorCode || e?.msg)
+        setError( errorMsg || "Something went wrong")
+        console.error("Error: ", e)
+      })
+      // return
+    }else if(mode === "direct" && VlCore?.isPlayerInitialised(playerId)){
+      VlCore.loadVideoInstantly(playerId, videoSourceUrl)
+      .catch((e) => {
+        const errorMsg = (typeof e === "string") ? e : (e?.response?.response?.data?.errorCode || e?.msg)
+        setError( errorMsg || "Something went wrong")
+        console.error("Error: ", e)
+      })
+      // VlCore.dispose(playerId)
+      // add the html again i.e videojs tag
+      // Now, again initilise player i.e  VLPlayerCore().init(config)
+    } else {
+     VlCore.init(config).then((e)=>{
+        console.log("init response: ",e);
+      })
+      .catch((e) => {
+        const errorMsg = (typeof e === "string") ? e : (e?.response?.response?.data?.errorCode || e?.msg)
+        setError( errorMsg || "Something went wrong")
+        console.error("Error: ", e)
+      })
+    }
   }
 
   const handleLoad = () => {
@@ -71,14 +91,15 @@ export default function PlayerTestPage() {
 
     if (mode === 'config') {
       setConfigInputs({ ...configInputs, sourceUrl: "" });
-      console.log('Config:', configInputs.token, configInputs.videoId, configInputs.apiBaseUrl);
+      console.log('Config Input:', configInputs.token, configInputs.videoId, configInputs.apiBaseUrl);
       // Call your player init with token, videoId, apiBaseUrl
       // initPlayer(config);
-    } else {
-      console.log('Source URL:', configInputs.sourceUrl);
+    } 
+    // else {
+      // console.log('Source URL:', configInputs.sourceUrl);
       // Call your player with source URL
       // initWithUrl(config.sourceUrl);
-    }
+    // }
     initialtePlayer()
   };
 
@@ -86,6 +107,7 @@ export default function PlayerTestPage() {
 
   // useEffect(() => {
   //   return () => {
+  //     // VLPlayerCore()?.dispose(playerId) 
   //   }
   // })
 
@@ -162,6 +184,51 @@ export default function PlayerTestPage() {
               />
             </div>
           )}
+          
+          {/* Autoplay Toggle */}
+          <div className="mb-3 flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="autoplay"
+              checked={configInputs.autoplay}
+              disabled={disableControls}
+              onChange={(e) =>
+                handleChange({ target: { name: 'autoplay', value: e.target.checked } })
+              }
+              className="form-checkbox"
+            />
+            <label className="text-sm font-medium">Autoplay</label>
+          </div>
+
+          {/* Mute Toggle */}
+          <div className="mb-3 flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="mute"
+              checked={configInputs.mute}
+              disabled={disableControls}
+              onChange={(e) =>
+                handleChange({ target: { name: 'mute', value: e.target.checked } })
+              }
+              className="form-checkbox"
+            />
+            <label className="text-sm font-medium">Mute</label>
+          </div>
+
+          {/* Theme Selector */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Theme</label>
+            <select
+              name="theme"
+              value={configInputs.theme}
+              onChange={handleChange}
+              disabled={disableControls}
+              className="w-full border px-3 py-2 rounded text-sm"
+            >
+              <option value="defaultV2">defaultV2</option>
+              <option value="vl-one">vl-one</option>
+            </select>
+          </div>
 
           <button
             onClick={handleLoad}
