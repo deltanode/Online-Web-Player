@@ -1,0 +1,22 @@
+.vl-container{
+    height: auto;
+    width: 800px;
+    margin: auto;
+}
+
+.App{
+    height: min-content;
+}
+
+.player-title{
+    font-size: 20px;
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+html{
+    background-color: aliceblue;
+}

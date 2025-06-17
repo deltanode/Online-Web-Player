@@ -1,0 +1,37 @@
+{
+  "name": "web-player-debugger",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server .",
+    "build": "Webpack ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.8",
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "@babel/runtime": "^7.17.8",
+    "@viewlift/player": "^2.0.14",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.4",
+    "dev-player": "file:../packages/player-core/src",
+    "webpack": "^5.71.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.8.0"
+  },
+  "dependencies": {
+    "css-loader": "^6.7.3",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "style-loader": "^3.3.1",
+    "videojs-contrib-quality-menu": "^1.0.4",
+    "videojs-dvr": "^1.4.0"
+  }
+}
