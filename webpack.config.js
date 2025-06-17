@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === "production";
 module.exports = {
   mode: isProduction ? "production" : "development",
 
-  entry: "./index.js", // adjust if your entry is elsewhere
+  entry: "./src/index.js", // adjust if your entry is elsewhere
 
   output: {
     path: path.resolve(__dirname, "dist"),
