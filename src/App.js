@@ -15,7 +15,7 @@ export default function PlayerTestPage() {
     apiBaseUrl: '',
     sourceUrl: '',
     autoplay: true,
-    mute: false,
+    mute: true,
     theme: 'defaultV2', 
   });
 
